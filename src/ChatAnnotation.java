@@ -67,7 +67,7 @@ public class ChatAnnotation {
             //系统问候语  
             SendHello(this.nickname);  
             //返回在线用户  
-            onlineList();  
+            onlineList();
         } catch (IOException e) {  
             e.printStackTrace();  
         }  
@@ -154,7 +154,7 @@ public class ChatAnnotation {
                     client.session.close();  
                 } catch (IOException e1) {  
                     e1.printStackTrace();  
-                }  
+                }
                 String message = String.format("* %s %s", client.nickname,"退出聊天室");  
                 broadcast(message);  
             }  
@@ -183,5 +183,5 @@ public class ChatAnnotation {
         for (ChatAnnotation client : connections) {  
             client.session.getBasicRemote().sendText(m);  
         }  
-    }  
+    }
 }
