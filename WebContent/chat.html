@@ -17,7 +17,7 @@
 -->
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<title>Apache Tomcat WebSocket Examples: Chat</title>
+<title>Chatroom</title>
 <link
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 	rel="stylesheet" />
@@ -40,16 +40,12 @@ input#chat {
 	width: 410px
 }
 
-
 #console {
-	border: 1px solid #CCCCCC;
-	border-right-color: #999999;
-	border-bottom-color: #999999;
-	height: 370px;
+	height: 433px;
 	overflow-y: scroll;
 	padding: 5px;
 	width: 100%;
-	color:#00ff00;
+	color: #000000;
 }
 
 #console p {
@@ -64,10 +60,12 @@ body {
 	width: 100%;
 	height: 100%;
 }
+
 .row {
-  margin-top: 5px;
-  margin-bottom: 5px;
+	margin-top: 2px;
+	margin-bottom: 2px;
 }
+
 .navbar-default {
 	background-color: #41a2d3;
 	border-color: #adb5c2;
@@ -172,12 +170,19 @@ body {
 		background-color: #adb5c2;
 	}
 }
+
+p
+{
+   color:black;
+}
+
 </style>
 <script type="application/javascript">
-	
+		var userid;
+		userid =  new Date().valueOf();
 	
         var Chat = {};
-
+        
         Chat.socket = null;
 
         Chat.connect = (function(host) {
@@ -211,24 +216,47 @@ body {
 
         Chat.initialize = function() {
             if (window.location.protocol == 'http:') {
-                Chat.connect('ws://' + window.location.host + '/TestWebSocket/websocket/chat');
+                Chat.connect('ws://' + window.location.host + '/TestWebSocket/websocket/'+userid);
             } else {
-                Chat.connect('wss://' + window.location.host + '/TestWebSocket/websocket/chat');
-            }
+                Chat.connect('wss://' + window.location.host + '/TestWebSocket/websocket/'+userid);
+             }
         };
-
+        
         Chat.sendMessage = (function() {
             var message = document.getElementById('chat').value;
+			var people = document.getElementById('name').value;
+            
+            if(people != ''){
+            	message = message + 'to' + people;
+            }
+            
             if (message != '') {
                 Chat.socket.send(message);
                 document.getElementById('chat').value = '';
             }
         });
 
+	
         var Console = {};
-
+		
+		
+        
         Console.log = (function(message) {
-            var console = document.getElementById('console');
+        	
+        	if(message.indexOf("当前在线用户")!=-1){
+        		var arr = message.split(",");
+        		for(var i = 1; i < arr.length; i++){
+        		document.getElementById('user'+i).innerHTML=arr[i];
+        		}
+        		setNumber(i-1);
+        		for(var i ; i<10 ; i++){
+        			if(document.getElementById('user'+i).innerHTML!='&nbsp'){
+        				document.getElementById('user'+i).innerHTML='&nbsp';
+        			}
+        		}
+        	}
+        	      	
+        	var console = document.getElementById('console');
             var p = document.createElement('p');
             p.style.wordWrap = 'break-word';
             p.innerHTML = message;
@@ -236,9 +264,13 @@ body {
             while (console.childNodes.length > 25) {
                 console.removeChild(console.firstChild);
             }
-            console.scrollTop = console.scrollHeight;
+            console.scrollTop = console.scrollHeight;    
         });
-
+        
+        setNumber = (function(number){
+			document.getElementById('counter').innerHTML=number;
+		})
+        
         Chat.initialize();
 
 
@@ -250,11 +282,13 @@ body {
             }
         }, false);
 
-    
+
+
 </script>
 </head>
 
 <body>
+	<!-- 顶部导航栏 -->
 	<nav class="navbar navbar-default" id="topnav">
 		<div class="container-fluid">
 			<!-- Brand and toggle get grouped for better mobile display -->
@@ -312,73 +346,109 @@ body {
 		</div>
 		<!-- /.container-fluid -->
 	</nav>
+	<!-- JavaScript错误提示 -->
 	<div class="noscript">
 		<h2 style="color: #ff0000">Seems your browser doesn't support
 			Javascript! Websockets rely on Javascript being enabled. Please
 			enable Javascript and reload this page!</h2>
 	</div>
 
-	<div>
+	<!-- 第一行 -->
+	<!-- 在线用户列表 -->
+	<div class="row">
 		<div class="col-md-3 hidden-xs main left-right">
 			<div class="panel panel-default">
-				<div class="panel-heading" style="font-weight:bold">在线用户
-				<span class="glyphicon glyphicon-user" aria-hidden="true" >
-				</span>
+				<div class="panel-heading" style="font-weight: bold">
+					在线用户 <span class="glyphicon glyphicon-user" aria-hidden="true">
+					</span> <span class="badge" style="float: right" id="counter">0</span>
 				</div>
 			</div>
 			<div class="list-group">
-				<button type="button" class="list-group-item">Cras justo
-					odio</button>
-				<button type="button" class="list-group-item">Dapibus ac
-					facilisis in</button>
-				<button type="button" class="list-group-item">Morbi leo
-					risus</button>
-				<button type="button" class="list-group-item">Porta ac
-					consectetur ac</button>
-				<button type="button" class="list-group-item">Vestibulum at
-					eros</button>
-				<button type="button" class="list-group-item"></button>
-				<button type="button" class="list-group-item"></button>
-				<button type="button" class="list-group-item"></button>
-				<button type="button" class="list-group-item"></button>
-				<button type="button" class="list-group-item"></button>
-				<button type="button" class="list-group-item"></button>					
+				<button type="button" class="list-group-item" id="user1"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user2"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user3"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user4"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user5"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user6"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user7"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user8"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user9"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
+				<button type="button" class="list-group-item" id="user10"
+					onclick="document.getElementById('name').value= document.getElementById(this.id).innerHTML">&nbsp;</button>
 			</div>
 		</div>
 
-		<div class="col-md-7 ">
+		<!-- 对话框 -->
+		<div class="col-md-6 ">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title" style="font-weight:bold">富强、民主、文明、和谐，自由、平等、公正、法治，爱国、敬业、诚信、友善。</h3>
+					<h3 class="panel-title" style="font-weight: bold">富强、民主、文明、和谐，自由、平等、公正、法治，爱国、敬业、诚信、友善。</h3>
 				</div>
-				
-				<div class="panel-body" id="console"></div>
+
+				<div class="panel-body" id="console" style="color:#000000"></div>
 			</div>
 		</div>
 
-	</div>
 
+		<!-- 时钟 -->
+		<div class="col-md-3">
+			<p>预留位置：JavaScript动态时钟
+		</div>
+	</div>
+	
+	<!-- 第二行 -->
+	<!-- 与客服交谈按钮 -->
 	<div class="row">
-		<div class="col-md-6 col-md-offset-3">
+		<div class="col-md-3 hidden-xs main left-right">
+			<button type="button" class="btn btn-success" id="contact">
+				与客服交谈 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+			</button>
+		</div>
+		
+		<!-- 输入框 -->
+		<div class="col-md-6 ">
 			<div class="input-group">
-				<span class="input-group-addon" id="basic-addon1">@</span> <input
+				<span class="input-group-addon"><span
+					class="glyphicon glyphicon-pencil" aria-hidden="true"></span></span> <input
 					type="text" class="form-control"
 					placeholder="type and press enter to chat" id="chat"
 					placeholder="Username" aria-describedby="basic-addon1" />
 			</div>
-
 		</div>
 	</div>
+
+	<!-- 第三行 -->
+	<!-- 私聊状态框 -->
 	<div class="row">
-		<div class="col-md-2 col-md-offset-3">
-			<div class="input-group">
-				<span class="input-group-addon" id="basic-addon1">@</span> <input
-					type="text" class="form-control" placeholder="Username"
-					aria-describedby="basic-addon1" />
+			<div class="col-md-3 hidden-xs main left-right">
+			<button type="button" class="btn btn-warning" id="contact">
+				返回聊天室 <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+			</button>
+		</div>
+		<div class="col-md-2  ">
+			<div class="input-group ">
+				<span class="input-group-addon">@</span> <input type="text"
+					class="form-control " placeholder="Username" id='name'
+					aria-describedby="basic-addon2"> </input>
+
 			</div>
 		</div>
+		<div class="col-md-2">
+			<button type="button" class="btn btn-default" style="height: 34px"
+				id="reset"
+				onclick="document.getElementById('name').value= &quot;&quot;">
+				<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+			</button>
+		</div>
 	</div>
-
-
 </body>
 </html>

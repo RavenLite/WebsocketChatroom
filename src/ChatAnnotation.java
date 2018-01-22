@@ -10,6 +10,7 @@ import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 /**
  * 消息分成三类
@@ -33,7 +34,7 @@ import javax.websocket.server.ServerEndpoint;
  */
 
 
-@ServerEndpoint(value = "/websocket/chat")
+@ServerEndpoint(value = "/websocket/{userid}")
 
 public class ChatAnnotation {
     private static final String GUEST_PREFIX = "用户";  
@@ -44,7 +45,7 @@ public class ChatAnnotation {
     private static final AtomicInteger connectionIds = new AtomicInteger(0);  
     private static final Set<ChatAnnotation> connections = new CopyOnWriteArraySet<>();  
   
-    private final String nickname;  
+    private  String nickname;  
     private Session session;  
   
     public ChatAnnotation() {  
@@ -57,7 +58,8 @@ public class ChatAnnotation {
      * @param session 
      */  
     @OnOpen  
-    public void start(Session session) {  
+    public void start(@PathParam("userid") String userid,Session session) { 
+    	nickname=userid;
         this.session = session;  
         connections.add(this);  
         String message = String.format("* %s %s", nickname, "加入聊天室");  
@@ -76,21 +78,25 @@ public class ChatAnnotation {
   
     /** 
      * 链接关闭时调用方法 
+     * @throws IOException 
      */  
     @OnClose  
-    public void end() {  
+    public void end(@PathParam("userid") String userid) throws IOException {  
+    	nickname=userid;
         connections.remove(this);  
         String message = String.format("* %s %s", nickname, "退出聊天室");  
         broadcast(message);
+        onlineList();
     }  
     /** 
      * 传输信息过程中调用方法 
      * @param message 
      */  
     @OnMessage  
-    public void incoming(String message) {  
+    public void incoming(@PathParam("userid") String userid,String message) {  
         // Never trust the client  
         // TODO: 过滤输入的内容  
+    	nickname=userid;
         String m = String.format("* %s %s", nickname, message);  
         if(m.contains("to")){  
             //点对点发送  
@@ -134,8 +140,9 @@ public class ChatAnnotation {
         }  
     }  
     /** 
-     * 点对点发送消息 
-     * 通过connections，对所有其他用户推送信息的方法 
+     * 一对一发送消息
+     * 类似于broadcast类
+     * 先遍历connections，向符合条件的人发送信息
      * @param msg 
      */  
     private static void broadcastOneToOne(String msg, String nickName) {  
@@ -144,7 +151,7 @@ public class ChatAnnotation {
             try {  
                 if(arr[1].equals(client.nickname) || nickName.equals(client.nickname)){  
                     synchronized (client) {  
-                        client.session.getBasicRemote().sendText(arr[0]);  
+                        client.session.getBasicRemote().sendText(arr[0]+"[私密消息]");  
                     }  
                 }  
             } catch (IOException e) {  
@@ -179,7 +186,7 @@ public class ChatAnnotation {
                 online += ","+client.nickname;  
             }  
         }  
-        String m = String.format("* %s %s", "当前在线用户", online);  
+        String m = String.format("* %s,%s", "当前在线用户", online);  
         for (ChatAnnotation client : connections) {  
             client.session.getBasicRemote().sendText(m);  
         }  
