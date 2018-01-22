@@ -36,7 +36,7 @@ body{
     100% {background:url("img/1.jpg");}
 }
 
-.form{background: rgba(255,255,255,0.2);width:400px;margin:120px auto;}
+.form{background: rgba(255,255,255,0.5);width:400px;margin:120px auto;}
 /*阴影*/
 .fa{
 	display: inline-block;
@@ -55,7 +55,15 @@ input[type="text"],input[type="password"]{
 </style>
 
 <script>
+function login1(){
+    var s = document.getElementById("username");
+    location.href="chat.html?"+"txt="+encodeURI(s.value);
+}
 
+function login2(){
+    var s = document.getElementById("username");
+    location.href="server.html?"+"txt="+encodeURI(s.value);
+}
 
 </script>
 
@@ -64,8 +72,9 @@ input[type="text"],input[type="password"]{
     <div class="container">
         <div class="form row">
             <div class="form-horizontal col-md-offset-3" id="login_form">
-                <h3 class="form-title">LOGIN</h3>
-                
+                <h2 class="form-title">Login</h3>
+                <p>登录，发现更多朋友
+                <p>欢迎来到Chatroom
                 <div class="col-md-9">
                     <div class="form-group">
                         <i class="fa fa-user fa-lg"></i>
@@ -77,18 +86,13 @@ input[type="text"],input[type="password"]{
                             <input class="form-control required" type="password" placeholder="Password" id="password" name="password" maxlength="8"/>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="checkbox">
-                            <input type="checkbox" name="userbox" value="1"/>用户
-                        </label>
-                        <label class="checkbox">
-                            <input type="checkbox" name="managerbox" value="1"/>管理员
-                        </label>
-                        
+                    
+                    <div class="form-group col-md-offset-9" type="submit" class="btn" >
+                        <button type="submit" class="btn btn-success pull-right btn-block" name="submit" onclick="login1()">User</button>
                     </div>
                     
-                    <div class="form-group col-md-offset-9">
-                        <button type="submit" class="btn btn-success pull-right" name="submit">登录</button>
+                    <div class="form-group col-md-offset-9" type="submit" class="btn" >
+                        <button type="submit" class="btn btn-warning pull-right btn-block" name="submit" onclick="login2()">Server</button>
                     </div>
                     
                 </div>
