@@ -187,12 +187,13 @@ p {
 		var userid;
 		userid =  new Date().valueOf();
 		var loc = location.href;
-		  var n1 = loc.length;//地址的总长度
-		  var n2 = loc.indexOf("=");//取得=号的位置
-		  var id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
-		  userid=id;
+		var n1 = loc.length;//地址的总长度
+		var n2 = loc.indexOf("=");//取得=号的位置
+		var id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
+		
+		userid=id;
         var Chat = {};
-        
+       
         Chat.socket = null;
 
         Chat.connect = (function(host) {
@@ -266,15 +267,35 @@ p {
         		}
         	}
         	      	
-        	var console = document.getElementById('console');
+        	else
+        	{
+        		var console = document.getElementById('console');
             var p = document.createElement('p');
             p.style.wordWrap = 'break-word';
             p.innerHTML = message;
+            if(message.indexOf("当前在线用户")!=-1){
+            	p.style.color="yellow";
+            }
+            else if(message.indexOf("私密消息")!=-1){
+            	p.style.color="red";
+            	p.style.font="bold";
+            }
+            else if(message.indexOf("加入聊天室")!=-1||message.indexOf("退出聊天室")!=-1||message.indexOf("Info")!=-1){
+            	p.style.color="black";
+            }
+            else{
+       			p.style.color="blue";
+            	if(message.indexOf("* "+userid)!=-1){
+            	}
+            }
+           
+            
             console.appendChild(p);
             while (console.childNodes.length > 25) {
                 console.removeChild(console.firstChild);
             }
-            console.scrollTop = console.scrollHeight;    
+            console.scrollTop = console.scrollHeight;  
+        	}
         });
         
         setNumber = (function(number){
@@ -283,7 +304,6 @@ p {
         
         Chat.initialize();
 
-
         document.addEventListener("DOMContentLoaded", function() {
             // Remove elements with "noscript" class - <noscript> is not allowed in XHTML
             var noscripts = document.getElementsByClassName("noscript");
@@ -291,9 +311,7 @@ p {
                 noscripts[i].parentNode.removeChild(noscripts[i]);
             }
         }, false);
-
-
-
+        
 </script>
 </head>
 
@@ -401,7 +419,7 @@ p {
 		<div class="col-md-6 ">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title" style="font-weight: bold">富强、民主、文明、和谐，自由、平等、公正、法治，爱国、敬业、诚信、友善。</h3>
+					<h3 class="panel-title" style="font-weight: bold" id="chattitles">富强、民主、文明、和谐，自由、平等、公正、法治，爱国、敬业、诚信、友善。</h3>
 				</div>
 
 				<div class="panel-body" id="console" style="color: #000000"></div>
@@ -419,7 +437,7 @@ p {
 	<!-- 与客服交谈按钮 -->
 	<div class="row">
 		<div class="col-md-3 hidden-xs main left-right">
-			<button type="button" class="btn btn-success" id="contact">
+			<button type="button" class="btn btn-success" id="contact" onclick="document.getElementById('name').value= &quot;客服&quot;">
 				与客服交谈 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
 			</button>
 		</div>
@@ -490,7 +508,7 @@ p {
          setTimeout(showTime, 1000);
          
      }
-
+		
      showTime();
      
 	</script>
