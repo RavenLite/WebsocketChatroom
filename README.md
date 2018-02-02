@@ -32,7 +32,7 @@ This is chatroom based on WebSocket.
   + JavaScript
   + CSS
   
-3.其他
+3. 其他
   + Bootstrap
 
 ## 写在后面
